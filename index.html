@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Stopwatch</title>
+
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body>
+        <div class="flex flex-col py-12 mx-auto items-center">
+            <div>
+                <span class="text-8xl ml-8"
+                    ><span id="min">00</span><span class="text-7xl">m</span></span
+                >
+                <span class="text-8xl ml-8"
+                    ><span id="sec">00</span><span class="text-7xl">s</span></span
+                >
+                <span id="ms" class="ml-8 text-gray-400 text-5xl">00</span>
+            </div>
+            <button
+                id="control-button"
+                class="mt-6 inline-flex h-12 items-center justify-center rounded-md bg-blue-600 px-6 font-medium text-neutral-50 transition active:scale-110"
+            >
+                Pause
+            </button>
+        </div>
+
+        <script>
+            const msEl = document.getElementById('ms');
+            const secEl = document.getElementById('sec');
+            const minEl = document.getElementById('min');
+            const btnEl = document.getElementById('control-button');
+
+            main();
+
+            // ---------------------------------------------------------
+
+            function main() {
+                let stopwatch = { current: 0 };
+                let ongoing = start(stopwatch);
+
+                const onControl = () => {
+                    if (ongoing) {
+                        clearInterval(ongoing);
+                        ongoing = null;
+                    } else {
+                        ongoing = start(stopwatch);
+                    }
+                    renderControlButton(ongoing);
+                };
+
+                btnEl.addEventListener('click', onControl);
+            }
+
+            function start(stopwatch) {
+                return setInterval(() => {
+                    const ms = (stopwatch.current % 1000) / 10;
+                    const sec = Math.floor((stopwatch.current / 1000) % 60);
+                    const min = Math.floor(stopwatch.current / (60 * 1000));
+                    renderStopwatch({ ms, sec, min });
+                    stopwatch.current += 10;
+                }, 10);
+            }
+
+            function formatNumber(num = 0) {
+                const str = num.toString();
+                return str.length === 1 ? `0${str}` : str;
+            }
+
+            function renderStopwatch({ ms = 0, sec = 0, min = 0 }) {
+                msEl.textContent = formatNumber(ms);
+                secEl.textContent = formatNumber(sec);
+                minEl.textContent = formatNumber(min);
+            }
+
+            function renderControlButton(ongoing = false) {
+                if (ongoing) {
+                    btnEl.textContent = 'Pause';
+                    btnEl.classList.add('bg-blue-600');
+                    btnEl.classList.remove('bg-teal-600');
+                } else {
+                    btnEl.textContent = 'Play';
+                    btnEl.classList.add('bg-teal-600');
+                    btnEl.classList.remove('bg-blue-600');
+                }
+            }
+        </script>
+    </body>
+</html>
